@@ -20,8 +20,8 @@ This project provides a set of tools to refactor and reorganize Business Central
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/bc-namespace-refactoring.git
-   cd bc-namespace-refactoring
+   git clone https://github.com/Rock-IT-GmbH/business-central-rework-namespaces
+   cd business-central-rework-namespaces
    ```
 
 2. Install the required dependencies:
