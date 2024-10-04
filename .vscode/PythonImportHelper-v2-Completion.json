@@ -1,0 +1,225 @@
+[
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
+        "label": "sqlite3",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlite3",
+        "description": "sqlite3",
+        "detail": "sqlite3",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "tqdm",
+        "importPath": "tqdm",
+        "description": "tqdm",
+        "isExtraImport": true,
+        "detail": "tqdm",
+        "documentation": {}
+    },
+    {
+        "label": "re",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "re",
+        "description": "re",
+        "detail": "re",
+        "documentation": {}
+    },
+    {
+        "label": "csv",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "csv",
+        "description": "csv",
+        "detail": "csv",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "process_file_with_claude",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def process_file_with_claude(file_path, prompt, api_key):\n    with open(file_path, 'r', encoding='utf-8') as file:\n        file_content = file.read()\n    headers = {\n        \"Content-Type\": \"application/json\",\n        \"X-API-Key\": api_key,\n        \"anthropic-version\": \"2023-06-01\",\n    }\n    data = {\n        #\"model\": \"claude-3-5-sonnet-20240620\",",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "get_namespace_from_file",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def get_namespace_from_file(file_path):\n    with open(file_path, 'r', encoding='utf-8') as file:\n        for line in file:\n            if line.strip().startswith('namespace'):\n                return line.strip()\n    return None\ndef get_object_namespace(cursor, object_type, object_name):\n    cursor.execute(\n        \"SELECT namespace FROM bc_objects WHERE object_type = ? AND object_name = ?\",\n        (object_type, object_name)",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "get_object_namespace",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def get_object_namespace(cursor, object_type, object_name):\n    cursor.execute(\n        \"SELECT namespace FROM bc_objects WHERE object_type = ? AND object_name = ?\",\n        (object_type, object_name)\n    )\n    result = cursor.fetchone()\n    return result[0] if result else None\ndef generate_using_statements(objects, cursor):\n    usings = set()\n    for obj in objects:",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "generate_using_statements",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def generate_using_statements(objects, cursor):\n    usings = set()\n    for obj in objects:\n        namespace = get_object_namespace(cursor, obj['object_type'], obj['object_name'])\n        if namespace:\n            usings.add(f\"using {namespace};\")\n    return sorted(list(usings))\ndef update_file_with_usings(file_path, using_statements):\n    with open(file_path, 'r', encoding='utf-8') as file:\n        lines = file.readlines()",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "update_file_with_usings",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def update_file_with_usings(file_path, using_statements):\n    with open(file_path, 'r', encoding='utf-8') as file:\n        lines = file.readlines()\n    namespace_index = next((i for i, line in enumerate(lines) if line.strip().startswith('namespace')), -1)\n    if namespace_index != -1:\n        insert_index = namespace_index + 1\n        using_statements.insert(0, '')  # Add a blank line before usings\n        lines[insert_index:insert_index] = [f\"{stmt}\\n\" for stmt in using_statements]\n        with open(file_path, 'w', encoding='utf-8') as file:\n            file.writelines(lines)",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "process_folder",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def process_folder(folder_path, prompt, db_path):\n    api_key = os.getenv('ANTHROPIC_API_KEY')\n    if not api_key:\n        raise ValueError(\"ANTHROPIC_API_KEY not found in environment variables\")\n    conn = sqlite3.connect(db_path)\n    cursor = conn.cursor()\n    total_files = sum(1 for root, _, files in os.walk(folder_path) for file in files if file.endswith('.al'))\n    processed_files = 0\n    total_objects = 0\n    with tqdm(total=total_files, desc=\"Processing files\", unit=\"file\") as pbar:",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "ai_rework_al_files",
+        "description": "ai_rework_al_files",
+        "peekOfCode": "def main():\n    prompt = \"\"\"\n    Analyze the following AL code from Business Central Dynamics and list all referenced objects\n    (pages, tables, reports, codeunits, queries, enums, interfaces) with their respective names. Ignore every already existing \"using\" line.\n    Return your response as a JSON array of objects, where each object has two properties:\n    'object_type' (lowercase) and 'object_name' (without quotes).\n    For example:\n    [\n        {\"object_type\": \"page\", \"object_name\": \"Customer List\"},\n        {\"object_type\": \"table\", \"object_name\": \"Customer\"},",
+        "detail": "ai_rework_al_files",
+        "documentation": {}
+    },
+    {
+        "label": "extract_info",
+        "kind": 2,
+        "importPath": "extract_bc_namespaces",
+        "description": "extract_bc_namespaces",
+        "peekOfCode": "def extract_info(file_path):\n    try:\n        with open(file_path, 'r', encoding='utf-8') as file:\n            content = file.read()\n        # Extract namespace\n        namespace_match = re.search(r'namespace\\s+([^;]+);', content)\n        namespace = namespace_match.group(1) if namespace_match else ''\n        # Extract object type, number (if present), and name\n        object_pattern = r'''\n            (table|page|report|codeunit|query|xmlport|enum|",
+        "detail": "extract_bc_namespaces",
+        "documentation": {}
+    },
+    {
+        "label": "process_directory",
+        "kind": 2,
+        "importPath": "extract_bc_namespaces",
+        "description": "extract_bc_namespaces",
+        "peekOfCode": "def process_directory(directory_path, output_csv, db_name):\n    # Set up SQLite database\n    conn = sqlite3.connect(db_name)\n    cursor = conn.cursor()\n    cursor.execute('''CREATE TABLE IF NOT EXISTS bc_objects\n                      (object_type TEXT, object_number TEXT, object_name TEXT, namespace TEXT, file_path TEXT)''')\n    with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile, \\\n         open('processing_log.txt', 'w', encoding='utf-8') as logfile, \\\n         open('error_log.txt', 'w', encoding='utf-8') as errorlog:\n        writer = csv.writer(csvfile)",
+        "detail": "extract_bc_namespaces",
+        "documentation": {}
+    },
+    {
+        "label": "directory_path",
+        "kind": 5,
+        "importPath": "extract_bc_namespaces",
+        "description": "extract_bc_namespaces",
+        "peekOfCode": "directory_path = input(\"Enter the path to the directory containing .al files: \")\noutput_csv = 'bc_objects.csv' #Only for quick access\ndb_name = 'bc_objects.db'#Changes here need to also be made in ai_rework_al_files.py\ntotal_files, processed_files = process_directory(directory_path, output_csv, db_name)\nprint(f\"CSV file has been created: {output_csv}\")\nprint(f\"SQLite database has been created: {db_name}\")\nprint(\"Processing log has been created: processing_log.txt\")\nprint(\"Error log has been created: error_log.txt\")\nprint(f\"Total .al files found: {total_files}\")\nprint(f\"Successfully processed files: {processed_files}\")",
+        "detail": "extract_bc_namespaces",
+        "documentation": {}
+    },
+    {
+        "label": "output_csv",
+        "kind": 5,
+        "importPath": "extract_bc_namespaces",
+        "description": "extract_bc_namespaces",
+        "peekOfCode": "output_csv = 'bc_objects.csv' #Only for quick access\ndb_name = 'bc_objects.db'#Changes here need to also be made in ai_rework_al_files.py\ntotal_files, processed_files = process_directory(directory_path, output_csv, db_name)\nprint(f\"CSV file has been created: {output_csv}\")\nprint(f\"SQLite database has been created: {db_name}\")\nprint(\"Processing log has been created: processing_log.txt\")\nprint(\"Error log has been created: error_log.txt\")\nprint(f\"Total .al files found: {total_files}\")\nprint(f\"Successfully processed files: {processed_files}\")\nif total_files != processed_files:",
+        "detail": "extract_bc_namespaces",
+        "documentation": {}
+    },
+    {
+        "label": "db_name",
+        "kind": 5,
+        "importPath": "extract_bc_namespaces",
+        "description": "extract_bc_namespaces",
+        "peekOfCode": "db_name = 'bc_objects.db'#Changes here need to also be made in ai_rework_al_files.py\ntotal_files, processed_files = process_directory(directory_path, output_csv, db_name)\nprint(f\"CSV file has been created: {output_csv}\")\nprint(f\"SQLite database has been created: {db_name}\")\nprint(\"Processing log has been created: processing_log.txt\")\nprint(\"Error log has been created: error_log.txt\")\nprint(f\"Total .al files found: {total_files}\")\nprint(f\"Successfully processed files: {processed_files}\")\nif total_files != processed_files:\n    print(f\"Warning: {total_files - processed_files} files were not processed successfully. Check error_log.txt for details.\", file=sys.stderr)",
+        "detail": "extract_bc_namespaces",
+        "documentation": {}
+    },
+    {
+        "label": "process_al_file",
+        "kind": 2,
+        "importPath": "reworkNamespaces",
+        "description": "reworkNamespaces",
+        "peekOfCode": "def process_al_file(file_path):\n    with open(file_path, 'r') as file:\n        content = file.read()\n    # Extract the some matching string from your file to create dynamics namespaces or just use a default one. Optional you could setup a namespace schema and let AI read the file and create the namespaces.\n    match = re.search(r'\\.\\w+(\\.\\w+)?', content)\n    if match:\n        namespace = match.group(0)\n    else:\n        namespace = \"DefaultNamespace\"\n    # Add namespace at the top of the file",
+        "detail": "reworkNamespaces",
+        "documentation": {}
+    },
+    {
+        "label": "process_directory",
+        "kind": 2,
+        "importPath": "reworkNamespaces",
+        "description": "reworkNamespaces",
+        "peekOfCode": "def process_directory(directory):\n    total_files = sum([len(files) for r, d, files in os.walk(directory) if any(f.endswith('.al') for f in files)])\n    processed_files = 0\n    for root, dirs, files in os.walk(directory):\n        for file in files:\n            if file.endswith(\".al\"):\n                file_path = os.path.join(root, file)\n                processed_files += 1\n                progress = (processed_files / total_files) * 100\n                print_loading(progress, file_path)",
+        "detail": "reworkNamespaces",
+        "documentation": {}
+    },
+    {
+        "label": "print_loading",
+        "kind": 2,
+        "importPath": "reworkNamespaces",
+        "description": "reworkNamespaces",
+        "peekOfCode": "def print_loading(progress, current_file):\n    bar_length = 20\n    filled_length = int(bar_length * progress // 100)\n    _ = '=' * filled_length + '-' * (bar_length - filled_length)\n    #TODO: Replace loading bar logic with a progress bar analog to AI process\nif __name__ == \"__main__\":\n    directory = input(\"Enter the directory path to process: \")\n    process_directory(directory)",
+        "detail": "reworkNamespaces",
+        "documentation": {}
+    }
+]
